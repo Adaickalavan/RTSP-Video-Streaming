@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gopkg.in/mgo.v2/bson"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,7 +12,15 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	mgo "gopkg.in/mgo.v2"
 )
+
+//Definition properties
+type Definition struct {
+	Word    string   `json:"word"`
+	Meaning string   `json:"m34eaning23"`
+	Usage   []string `json:"usage"`
+}
 
 func main() {
 	//Load .env file
@@ -20,14 +29,44 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Fatal(run())
+	//Create a session
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	//Create additional sessions
+	anotherSession := session.Copy()
+	defer anotherSession.Close()
+
+	//Create a new document
+	c := session.DB("dictionary").C("definitions")
+	var definition2 = Definition{
+		Word:"hi",
+		Meaning:"greeting",
+		Usage:[]string{"when you meet someone"},
+	}
+	err = c.Insert(definition2)
+	var definition1 = Definition{
+		Word:"bye",
+		Meaning:"greeting",
+		Usage:[]string{"when you leave someone"},
+	}
+	err = c.Insert(definition1)
+
+	var def []Definition
+	c.Find(bson.M{"word":"bye"}).All(&def)
+
+	fmt.Println(def)	
+	// log.Fatal(run())
+	// c.RemoveAll(nil)
 	fmt.Println("Program completed")
 }
 
 func makeMuxRouter() http.Handler {
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/definition", getDefinition).Methods("GET")
-	// muxRouter.HandleFunc("/", handleWriteBlock).Methods("POST")
+	// muxRouter.HandleFunc("/request", handleWriteBlock).Methods("POST")
 	return muxRouter
 }
 
