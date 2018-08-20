@@ -12,6 +12,7 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
+//Hooks that may be overridden for testing
 var inputReader io.Reader = os.Stdin
 var outputWriter io.Writer = os.Stdout
 
