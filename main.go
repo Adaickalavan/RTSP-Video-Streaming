@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -15,13 +17,6 @@ import (
 //Hooks that may be overridden for testing
 var inputReader io.Reader = os.Stdin
 var outputWriter io.Writer = os.Stdout
-
-//Definition properties
-type Definition struct {
-	Word    string   `json:"word"`
-	Meaning string   `json:"meaning"`
-	Usage   []string `json:"usage"`
-}
 
 func main() {
 	//Load .env file
@@ -40,56 +35,63 @@ func main() {
 	anotherSession := session.Copy()
 	defer anotherSession.Close()
 
+	var db *mgo.Database
+	const COLLECTION = "collection"
+
 	//Create a new document
-	c := session.DB("dictionary").C("definitions")
-	var definition2 = Definition{
-		Word:    "hi",
+	c := session.DB("dictionary").C("words")
+
+
+
+	//Insert documents into MongoDB
+	var word2 = Word{
+		Value:   "hi",
 		Meaning: "greeting",
 		Usage:   []string{"when you meet someone"},
 	}
-	err = c.Insert(definition2)
-	var definition1 = Definition{
-		Word:    "bye",
+	err = c.Insert(word2)
+	var word1 = Word{
+		Value:   "bye",
 		Meaning: "greeting",
 		Usage:   []string{"when you leave someone"},
 	}
-	err = c.Insert(definition1)
+	err = c.Insert(word1)
 
-	index := mgo.Index{
-		Key:        []string{"word"}, //Index key fields; prefix name with (-) dash for descending order
-		Unique:     true,             //Prevent two documents from having the same key
-		DropDups:   true,             //Drop documents with same index
-		Background: true,             //Build index in background and return immediately
-		Sparse:     true,             //Only index documents containing the Key fields
-	}
-	err = c.EnsureIndex(index)
+	//Update document in MongoDB
+	fmt.Println("Updating doc")
+	var def Word
+	// c.Find(bson.M{"word": "bye"}).One(&def)
+	err = c.Update(bson.M{"word": "bye"}, &Word{Value: "dfrebye", Meaning: "greeting", Usage: []string{"chandwdged"}})
 	checkError(err)
 
-	var def []Definition
-	c.Find(bson.M{"word": "bye"}).All(&def)
+	//Fetch documents from MongoDB
+	var defs []Word
+	c.Find(bson.M{"meaning": "greeting"}).All(&defs)
 
+	fmt.Println(defs)
 	fmt.Println(def)
-	// log.Fatal(run())
-	// c.RemoveAll(nil)
 	fmt.Println("Program completed")
+
+	run()
+
 }
 
-// func run() error {
-// 	mux := makeMuxRouter()
-// 	httpAddr := os.Getenv("ADDR")
-// 	log.Println("Listening on ", httpAddr)
-// 	s := &http.Server{
-// 		Addr:           ":" + httpAddr,
-// 		Handler:        mux,
-// 		ReadTimeout:    10 * time.Second,
-// 		WriteTimeout:   10 * time.Second,
-// 		MaxHeaderBytes: 1 << 20,
-// 	}
-// 	if err := s.ListenAndServe(); err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func run() error {
+	mux := makeMuxRouter()
+	httpAddr := os.Getenv("ADDR")
+	log.Println("Listening on ", httpAddr)
+	s := &http.Server{
+		Addr:           ":" + httpAddr,
+		Handler:        mux,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	if err := s.ListenAndServe(); err != nil {
+		return err
+	}
+	return nil
+}
 
 func checkError(err error) bool {
 	if err != nil {
