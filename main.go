@@ -36,12 +36,10 @@ func main() {
 	defer anotherSession.Close()
 
 	var db *mgo.Database
-	const COLLECTION = "collection"
+	const COLLECTION = "words"
 
 	//Create a new document
 	c := session.DB("dictionary").C("words")
-
-
 
 	//Insert documents into MongoDB
 	var word2 = Word{

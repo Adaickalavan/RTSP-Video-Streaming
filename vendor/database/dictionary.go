@@ -4,10 +4,7 @@ import (
 	"database/sql"
 
 	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
-
-
 
 func setupDB() {
 	// Setup connection to our postgresql database
@@ -34,9 +31,20 @@ func setupDB() {
 	store = &dbStore{db: db}
 }
 
-func (word Words) ensureIndex(c *Collection) {
+type Dictionary struct {
+	Server   string
+	Database string
+}
+
+const COLLECTION = "words"
+
+func (dictionary Dictionary) Connect() {
+
+}
+
+func (dictionary Dictionary) ensureIndex(c *Collection) {
 	//Ensure index in MongoDB
-	ind)ex := mgo.Index{
+	index := mgo.Index{
 		Key:        []string{"value"}, //Index key fields; prefix name with (-) dash for descending order
 		Unique:     true,              //Prevent two documents from having the same key
 		DropDups:   true,              //Drop documents with same index
