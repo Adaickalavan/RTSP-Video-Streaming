@@ -1,16 +1,19 @@
 package main
 
 import (
+	"document"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func makeMuxRouter() http.Handler {
 	muxRouter := mux.NewRouter()
-	muxRouter.HandleFunc("/definition/{id}", handlerGetDefinitionID).Methods("GET")
+	muxRouter.HandleFunc("/definition/", handlerGetDefinitionByID).Methods("GET")
 	muxRouter.HandleFunc("/definition", handlerPostDefinition).Methods("POST")
 	muxRouter.HandleFunc("/definition", handlerGetDefinition).Methods("GET")
 	muxRouter.HandleFunc("/definition", handlerPutDefinition).Methods("PUT")
@@ -18,35 +21,51 @@ func makeMuxRouter() http.Handler {
 }
 
 func handlerGetDefinition(w http.ResponseWriter, r *http.Request) {
-	// Retrieve people from postgresql database using our `store` interface variable's
-	// `func (*dbstore) GetPerson` pointer receiver method defined in `store.go` file
-	// personList, err := store.GetPerson()
+	movies, err := dictionary.FindAll()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, movies)
+}
 
-	// // Convert the `personList` variable to JSON
-	// personListBytes, err := json.Marshal(personList)
-	// if err != nil {
-	// 	fmt.Println(fmt.Errorf("Error: %v", err))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// // Write JSON list of persons to response
-	// w.Write(personListBytes)
-
-	fmt.Fprintln(w, "Not implemented yet get def")
+func handlerGetDefinitionByID(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	word, err := dictionary.FindByValue(query.Get("word"))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, word)
 }
 
 func handlerPostDefinition(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not implemented yet postdef")
+	defer r.Body.Close()
+
+	var word document.Word
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&word); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	word.ID = bson.NewObjectId()
+	err := dictionary.Insert(word)
+	switch {
+	case mgo.IsDup(err):
+		respondWithError(w, http.StatusConflict, err.Error())
+		return
+	case err != nil:
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusCreated, word)
 }
-func handlerGetDefinitionID(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not implemented yet getdefID")
-}
+
 func handlerPutDefinition(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Not implemented yet putdef")
 }
 
-func respondWithError(w http.ResponseWriter, r *http.Request, code int, msg string) {
+func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJSON(w, code, map[string]string{"error": msg})
 }
 

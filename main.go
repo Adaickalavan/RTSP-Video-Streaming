@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database"
 	"fmt"
 	"io"
 	"log"
@@ -8,66 +9,34 @@ import (
 	"os"
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/joho/godotenv"
-	mgo "gopkg.in/mgo.v2"
 )
 
 //Hooks that may be overridden for testing
 var inputReader io.Reader = os.Stdin
 var outputWriter io.Writer = os.Stdout
 
-func main() {
+var dictionary = database.Dictionary{}
+
+func init() {
 	//Load .env file
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//Create a session
+	//Connect to MongoDB server
+	dictionary.Server = os.Getenv("server")
+	dictionary.DatabaseName = os.Getenv("databaseName")
+	dictionary.Connect()
+	dictionary.EnsureIndex([]string{"value"})
+}
 
-	defer session.Close()
-	//Create additional sessions
-	anotherSession := session.Copy()
-	defer anotherSession.Close()
+func main() {
 
-	var db *mgo.Database
-	const COLLECTION = "words"
-
-	//Create a new document
-	c := session.DB("dictionary").C("words")
-
-	//Insert documents into MongoDB
-	var word2 = Word{
-		Value:   "hi",
-		Meaning: "greeting",
-		Usage:   []string{"when you meet someone"},
+	if err := run(); err != nil {
+		log.Fatal(err.Error())
 	}
-	err = c.Insert(word2)
-	var word1 = Word{
-		Value:   "bye",
-		Meaning: "greeting",
-		Usage:   []string{"when you leave someone"},
-	}
-	err = c.Insert(word1)
-
-	//Update document in MongoDB
-	fmt.Println("Updating doc")
-	var def Word
-	// c.Find(bson.M{"word": "bye"}).One(&def)
-	err = c.Update(bson.M{"word": "bye"}, &Word{Value: "dfrebye", Meaning: "greeting", Usage: []string{"chandwdged"}})
-	checkError(err)
-
-	//Fetch documents from MongoDB
-	var defs []Word
-	c.Find(bson.M{"meaning": "greeting"}).All(&defs)
-
-	fmt.Println(defs)
-	fmt.Println(def)
-	fmt.Println("Program completed")
-
-	run()
 
 }
 
