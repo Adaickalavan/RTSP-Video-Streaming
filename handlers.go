@@ -13,14 +13,14 @@ import (
 
 func makeMuxRouter() http.Handler {
 	muxRouter := mux.NewRouter()
-	muxRouter.HandleFunc("/definition/", handlerGetDefinitionByID).Methods("GET")
-	muxRouter.HandleFunc("/definition", handlerPostDefinition).Methods("POST")
-	muxRouter.HandleFunc("/definition", handlerGetDefinition).Methods("GET")
-	muxRouter.HandleFunc("/definition", handlerPutDefinition).Methods("PUT")
+	muxRouter.HandleFunc("/definition/", handlerGetWordByID).Methods("GET")
+	muxRouter.HandleFunc("/definition", handlerGetWord).Methods("GET")
+	muxRouter.HandleFunc("/definition", handlerPostWord).Methods("POST")
+	muxRouter.HandleFunc("/definition", handlerPutWord).Methods("PUT")
 	return muxRouter
 }
 
-func handlerGetDefinition(w http.ResponseWriter, r *http.Request) {
+func handlerGetWord(w http.ResponseWriter, r *http.Request) {
 	movies, err := dictionary.FindAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -29,7 +29,7 @@ func handlerGetDefinition(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, movies)
 }
 
-func handlerGetDefinitionByID(w http.ResponseWriter, r *http.Request) {
+func handlerGetWordByID(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	word, err := dictionary.FindByValue(query.Get("word"))
 	if err != nil {
@@ -39,7 +39,7 @@ func handlerGetDefinitionByID(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, word)
 }
 
-func handlerPostDefinition(w http.ResponseWriter, r *http.Request) {
+func handlerPostWord(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var word document.Word
@@ -49,6 +49,7 @@ func handlerPostDefinition(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	word.ID = bson.NewObjectId()
+	word.Meaning = "dummy"
 	err := dictionary.Insert(word)
 	switch {
 	case mgo.IsDup(err):
@@ -61,7 +62,7 @@ func handlerPostDefinition(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, word)
 }
 
-func handlerPutDefinition(w http.ResponseWriter, r *http.Request) {
+func handlerPutWord(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Not implemented yet putdef")
 }
 
@@ -73,8 +74,6 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, err := json.MarshalIndent(payload, "", " ")
 	if err != nil {
 		http.Error(w, "HTTP 500: Internal Server Error", http.StatusInternalServerError)
-		// w.WriteHeader(http.StatusInternalServerError)
-		// w.Write([]byte("HTTP 500: Internal Server Error"))
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
