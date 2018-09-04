@@ -26,10 +26,7 @@ func main() {
 	}
 
 	//Create a session
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
+
 	defer session.Close()
 	//Create additional sessions
 	anotherSession := session.Copy()
