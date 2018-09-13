@@ -25,14 +25,12 @@ func init() {
 		log.Fatal(err)
 	}
 
-	//Connect to MongoDB server
-	dictionary.Server = os.Getenv("server")
-	dictionary.DatabaseName = os.Getenv("databaseName")
-	dictionary.Connect()
-	dictionary.EnsureIndex([]string{"value"})
 }
 
 func main() {
+
+	dictionary.Session = dictionary.Connect()
+	dictionary.EnsureIndex([]string{"value"})
 
 	if err := run(); err != nil {
 		log.Fatal(err.Error())
@@ -42,7 +40,7 @@ func main() {
 
 func run() error {
 	mux := makeMuxRouter()
-	httpAddr := os.Getenv("ADDR")
+	httpAddr := os.Getenv("LISTENINGADDR")
 	log.Println("Listening on ", httpAddr)
 	s := &http.Server{
 		Addr:           ":" + httpAddr,

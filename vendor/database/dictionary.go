@@ -4,6 +4,8 @@ import (
 	"document"
 	"fmt"
 	"log"
+	"os"
+	"time"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -18,15 +20,22 @@ const COLLECTION = "words"
 type Dictionary struct {
 	Server       string
 	DatabaseName string
+	Session      *mgo.Session
 }
 
 //Connect connects to the database
-func (dictionary Dictionary) Connect() {
-	session, err := mgo.Dial(dictionary.Server)
+func (dictionary Dictionary) Connect() *mgo.Session {
+	info := &mgo.DialInfo{
+		Addrs:    []string{os.Getenv("SERVER")},
+		Timeout:  60 * time.Second,
+		Database: os.Getenv("DATABASENAME"),
+	}
+	session, err := mgo.DialWithInfo(info)
 	if err != nil {
 		log.Fatal(err)
 	}
 	db = session.DB(dictionary.DatabaseName)
+	return session
 }
 
 //EnsureIndex creates an index field in the collection

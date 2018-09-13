@@ -49,7 +49,6 @@ func handlerPostWord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	word.ID = bson.NewObjectId()
-	word.Meaning = "dummy"
 	err := dictionary.Insert(word)
 	switch {
 	case mgo.IsDup(err):
