@@ -9,14 +9,6 @@ services:
       - network1  
     volumes:
       - "mongodata:/data/db"    
-  kafka:
-    container_name: 'kafka'
-    image: spotify/kafka
-    ports:
-      - "2181:2181"
-      - "9092:9092"
-    networks:
-      - network1
   dictionary:
     container_name: 'dictionary'
     image: dictionaryapi
@@ -26,7 +18,6 @@ services:
       - network1
     depends_on:
       - mongo
-      - kafka
     environment:
       - SERVER=mongo:27017  
       - DATABASENAME=dictionary
