@@ -12,3 +12,5 @@ Docker commands:
    + `docker-compose down -v`
 
 Further extension of functionality and more description of the code will be proivded later.
+
+See [website](https://adaickalavan.github.io/portfolio/docker_golang_rest_kafka_mongodb/) for information.
