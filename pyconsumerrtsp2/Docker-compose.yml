@@ -1,0 +1,22 @@
+---
+version: '3'
+services:
+
+  #Consumer to read from Kafka queue
+  consumerpython:
+    image: consumerpython
+    container_name: consumerpython
+    environment:
+      - KAFKAPORT=kafka:9092
+      - TOPICNAME=timeseries_1
+      - ZOOKEEPERPORT=zookeeper:2181 
+      - CONSUMERGROUP=consumerGroup_2
+    networks:
+      - zookeeper_dockerNet 
+        # To ensure that the containers in different docker-compose files communicate with each other,
+        # we place them on the same network. The full network name from 'kafka-zookeeper-mongo' docker-compose
+        # file is 'kafka_zookeeper_mongo_dockerNet'.
+
+networks:
+  zookeeper_dockerNet:
+    external: true #Label the other docker-compose network as an external network to the current docker-compose file
