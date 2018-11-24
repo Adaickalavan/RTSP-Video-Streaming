@@ -16,9 +16,6 @@ def handler(val):
     img = np.stack((imgR, imgG, imgB))
     img = np.moveaxis(img, 0, -1)
 
-    # img = cv2.imdecode(npArray, cv2.IMREAD_COLOR)  # cv2.IMREAD_COLOR in OpenCV 3.1
-    # img = cv2.imread(npArray, 1)
-
     return img
 
 

@@ -79,9 +79,6 @@ func main() {
 		//Send message into Kafka queue
 		producer.Input() <- msg
 
-		// time.Sleep(1000 * time.Millisecond)
-		// fmt.Println("img.Pix ==", img.Pix)
-		// fmt.Println("Length of Pix==", len(img.Pix))
 		fmt.Fprintf(outputWriter, "---->>>> %v\n", time.Now())
 	}
 }
