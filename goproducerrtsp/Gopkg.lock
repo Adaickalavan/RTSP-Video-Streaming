@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:327fcdf97499dd7ab6b60e84cf11e3c6c99899d676f6c1543207f30a4a9aedbb"
-  name = "github.com/adaickalavan/Go-Rest-Kafka-Mongo"
-  packages = ["kafkapc"]
+  digest = "1:7eaef939bedc49e160d032b1dea7b20ee19c453b6100e1544cb5ad82c7381b95"
+  name = "github.com/adaickalavan/kafkapc"
+  packages = ["."]
   pruneopts = "UT"
-  revision = "8a6b75eb29c2b976b279d6f0c39f99e836b67d49"
+  revision = "27b03eb8b4c7e958c0939009dc148175dc55b462"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -113,7 +113,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Shopify/sarama",
-    "github.com/adaickalavan/Go-Rest-Kafka-Mongo/kafkapc",
+    "github.com/adaickalavan/kafkapc",
     "gocv.io/x/gocv",
   ]
   solver-name = "gps-cdcl"

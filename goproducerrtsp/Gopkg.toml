@@ -30,10 +30,6 @@
   version = "1.19.0"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/adaickalavan/Go-Rest-Kafka-Mongo"
-
-[[constraint]]
   name = "gocv.io/x/gocv"
   version = "0.17.0"
 

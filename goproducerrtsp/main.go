@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/adaickalavan/Go-Rest-Kafka-Mongo/kafkapc"
+	"github.com/adaickalavan/kafkapc"
 	"gocv.io/x/gocv"
 )
 
@@ -85,8 +85,8 @@ func main() {
 
 //Result represents the Kafka queue message format
 type Result struct {
-	Pix      []byte    `json:"pix"`
-	Channels int       `json:"channels"`
-	Rows     int       `json:"rows"`
-	Cols     int       `json:"cols"`
+	Pix      []byte `json:"pix"`
+	Channels int    `json:"channels"`
+	Rows     int    `json:"rows"`
+	Cols     int    `json:"cols"`
 }
