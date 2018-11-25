@@ -2,7 +2,7 @@ FROM denismakogon/gocv-alpine:3.4.2-buildstage as build-stage
 
 #Copy the local package files (from development computer) to the container's workspace (docker image)
 COPY . /go/src/app 
-# BUild the app command inside the container
+# Build the app command inside the container
 RUN go install app
 
 
