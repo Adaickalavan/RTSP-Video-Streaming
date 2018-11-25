@@ -5,11 +5,11 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper
     container_name: zookeeper   
-    restart: always
+    restart: always #Ensures that intermittent failures in the Docker environment do not result in unnecessary failures of the service.
     networks:
       - dockerNet
     ports:
-      - 2181:2181 #Zookeeper
+      - 2181:2181 #Zookeeper port - access port for external communication
     environment:
       - ZOOKEEPER_SERVER_ID=1
       - ZOOKEEPER_CLIENT_PORT=2181
@@ -19,18 +19,18 @@ services:
   kafka:
     image: confluentinc/cp-kafka
     container_name: kafka
-    restart: always
+    restart: always #Ensures that intermittent failures in the Docker environment do not result in unnecessary failures of the service.
     depends_on:
       - zookeeper
     networks:
       - dockerNet 
     ports:
-      - 9092:9092 #Kafka broker - access port for external 
+      - 9092:9092 #Kafka broker - access port for external communication
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181   
-      # - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT_HOST://localhost:9092, PLAINTEXT://kafka:29092    
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT_HOST://192.168.99.100:9092, PLAINTEXT://kafka:29092    
+      # - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT_HOST://localhost:9092, PLAINTEXT://kafka:29092 #For native Docker (e.g., in Windows 10)
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT_HOST://192.168.99.100:9092, PLAINTEXT://kafka:29092 #For Docker Tool (e.g., in Windows 7) 
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_JMX_PORT=1099
