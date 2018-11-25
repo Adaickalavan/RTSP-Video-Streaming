@@ -79,6 +79,7 @@ func main() {
 		//Send message into Kafka queue
 		producer.Input() <- msg
 
+		//Print time of receiving each image to show the code is running
 		fmt.Fprintf(outputWriter, "---->>>> %v\n", time.Now())
 	}
 }
