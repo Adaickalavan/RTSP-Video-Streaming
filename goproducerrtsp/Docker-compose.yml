@@ -3,7 +3,7 @@ version: '3'
 
 services:
   #Producer to obtain data from RTSP and write into Kafka queue
-  rtsp:
+  goproducerrtsp:
     image: goproducerrtsp
     container_name: goproducerrtsp   
     environment:
