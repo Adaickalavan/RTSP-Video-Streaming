@@ -26,7 +26,7 @@ def main():
     for m in consumer:
         #Read message contents
         val = m.value
-        print("Time:",m.timestamp,", Topic:",m.topic) 
+        print("Time:",m.timestamp,", Topic:",m.topic)
 
         #Message handler
         img = message.handler(val)

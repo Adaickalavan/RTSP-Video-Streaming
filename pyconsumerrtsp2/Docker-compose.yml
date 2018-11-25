@@ -13,9 +13,7 @@ services:
       - CONSUMERGROUP=consumerGroup_2
     networks:
       - zookeeper_dockerNet 
-        # To ensure that the containers in different docker-compose files communicate with each other,
-        # we place them on the same network. The full network name from 'kafka-zookeeper-mongo' docker-compose
-        # file is 'kafka_zookeeper_mongo_dockerNet'.
+        # To ensure that the containers in different docker-compose files communicate with each other, we place them on the same network. The complete network name is 'zookeeper_dockerNet'. It is derived by joining the name of the folder from which the network originates (i.e., zookeeper) and the name of the network (i.e., dockerNet).
 
 networks:
   zookeeper_dockerNet:
